@@ -22,5 +22,5 @@ public class AwardsIntervalController {
 	public ResponseEntity<AwardsIntervalDTO> getAwardsInterval() {
 		return new ResponseEntity<AwardsIntervalDTO>(awardsIntervalService.getAwardsInterval(), HttpStatus.OK);
 	}
-	
+
 }
