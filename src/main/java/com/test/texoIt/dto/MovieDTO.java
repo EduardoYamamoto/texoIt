@@ -27,7 +27,20 @@ public class MovieDTO {
 	
 	@Column
 	private String winner;
-	
+
+	public MovieDTO() {
+		super();
+	}
+
+	public MovieDTO(MovieDTO movieDTO) {
+		super();
+		movieid = movieDTO.getMovieid();
+		movieyear = movieDTO.getMovieyear();
+		title = movieDTO.getTitle();
+		studios = movieDTO.getStudios();
+		producers = movieDTO.getProducers();
+		winner = movieDTO.getWinner();
+	}
 	
 	public int getMovieid() {
 		return movieid;

@@ -24,11 +24,10 @@ public class AwardsIntervalService {
 
 	public AwardsIntervalDTO getAwardsInterval() {
 		//generate a map of producers and their awards
-		Map<String, List<AwardDTO>> awardsPerProducer = StreamSupport.stream(movieRepository.findAll().spliterator(), false)
-				.filter(movie -> movie.isWinner())
+		Map<String, List<AwardDTO>> awardsPerProducer = generateParsedMovieList().stream()
 				.collect(Collectors.groupingBy(MovieDTO::getProducers, 
 					Collectors.collectingAndThen(Collectors.toList(), list -> {
-						return getAwardList(list);
+						return getAwardListFromMovies(list);
 					})));
 		
 		//group all awards together
@@ -38,7 +37,23 @@ public class AwardsIntervalService {
 		return new AwardsIntervalDTO(getMin(allAwardsList), getMax(allAwardsList));
 	}
 	
-	private List<AwardDTO> getAwardList(List<MovieDTO> movieList) {
+	private List<MovieDTO> generateParsedMovieList() {
+		List<MovieDTO> movieList = new ArrayList<MovieDTO>();
+		
+		//parse each producer and create a new MovieDTO
+		StreamSupport.stream(movieRepository.findAll().spliterator(), false)
+				.filter(movie -> movie.isWinner())
+				.forEach(movie -> {
+					for(String producer : movie.getProducers().split(",| and ")) {
+						MovieDTO parsedMovie = new MovieDTO(movie);
+						parsedMovie.setProducers(producer.trim());
+						movieList.add(parsedMovie);
+					}
+				});
+		return movieList;
+	}
+	
+	private List<AwardDTO> getAwardListFromMovies(List<MovieDTO> movieList) {
 		//order movies by year
 		List<MovieDTO> orderedMovieList = movieList.stream()
 				.sorted(Comparator.comparing(MovieDTO::getMovieyear))
